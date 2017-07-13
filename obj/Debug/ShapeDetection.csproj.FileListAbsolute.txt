@@ -1,0 +1,8 @@
+C:\Users\bk\Documents\Visual Studio 2017\bin\pic3.png
+C:\Users\bk\Documents\Visual Studio 2017\bin\Example.ShapeDetection.exe
+C:\Users\bk\Documents\Visual Studio 2017\bin\Example.ShapeDetection.pdb
+C:\Users\bk\Documents\Visual Studio 2017\Projects\ShapeDetection\obj\Debug\ShapeDetection.csprojResolveAssemblyReference.cache
+C:\Users\bk\Documents\Visual Studio 2017\Projects\ShapeDetection\obj\Debug\ShapeDetection.MainForm.resources
+C:\Users\bk\Documents\Visual Studio 2017\Projects\ShapeDetection\obj\Debug\ShapeDetection.csproj.GenerateResource.Cache
+C:\Users\bk\Documents\Visual Studio 2017\Projects\ShapeDetection\obj\Debug\Example.ShapeDetection.exe
+C:\Users\bk\Documents\Visual Studio 2017\Projects\ShapeDetection\obj\Debug\Example.ShapeDetection.pdb

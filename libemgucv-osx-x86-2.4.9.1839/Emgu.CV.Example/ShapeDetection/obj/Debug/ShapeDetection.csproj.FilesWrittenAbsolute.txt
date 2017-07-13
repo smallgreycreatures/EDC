@@ -1,0 +1,1 @@
+/Users/Frans/Documents/c-sharp/Detab/libemgucv-osx-x86-2.4.9.1839/Emgu.CV.Example/ShapeDetection/obj/Debug/ShapeDetection.MainForm.resources

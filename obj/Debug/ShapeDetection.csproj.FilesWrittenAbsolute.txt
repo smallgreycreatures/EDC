@@ -1,0 +1,7 @@
+/Users/Frans/Documents/c-sharp/Detab/ShapeDetection/obj/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
+/Users/Frans/Documents/c-sharp/Detab/ShapeDetection/obj/Debug/ShapeDetection.MainForm.resources
+/Users/Frans/Documents/c-sharp/bin/pic3.png
+/Users/Frans/Documents/c-sharp/bin/Example.ShapeDetection.pdb
+/Users/Frans/Documents/c-sharp/bin/Example.ShapeDetection.exe
+/Users/Frans/Documents/c-sharp/Detab/ShapeDetection/obj/Debug/Example.ShapeDetection.exe
+/Users/Frans/Documents/c-sharp/Detab/ShapeDetection/obj/Debug/Example.ShapeDetection.pdb
