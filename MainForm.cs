@@ -539,15 +539,16 @@ namespace ShapeDetection
 
             //Create edges
             int MIN_LINE_LENGTH = 6;
+			List<List<Tuple<double,double>>> lineSegmentCollection = new List<List<Tuple<double,double>>>();
             foreach (Tuple<List<double>, List<double>> edgeSegment in edgeSegments2)
             {
-
+				List<Tuple<double,double>> linesOfAnEdgeSegment = new List<Tuple<double,double>>();
                 List<double> xData = new List<double>();
                 xData = edgeSegment.Item1;
                 List<double> yData = new List<double>();
                 yData = edgeSegment.Item2;
 
-                LineFit(edgeSegment);
+				LineFit(edgeSegment, linesOfAnEdgeSegment);
 
             }
             /*
@@ -618,7 +619,7 @@ namespace ShapeDetection
         }
 
 
-        public void LineFit(Tuple<List<double>, List<double>> edgeSegment)
+		public void LineFit(Tuple<List<double>, List<double>> edgeSegment, List<Tuple<double,double>> linesOfAnEdgeSegment)
         {
             List<double> xData = new List<double>();
             xData = edgeSegment.Item1;
@@ -694,7 +695,7 @@ namespace ShapeDetection
 
             Tuple<double, double> line3 = Fit.Line(xDataExtended.ToArray(), yDataExtended.ToArray());
 
-
+			linesOfAnEdgeSegment.Add (line3);
 
 
 
