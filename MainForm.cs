@@ -30,50 +30,54 @@ namespace ShapeDetection
         }
         const int HORIZONTAL = 255;
         const int VERTICAL = 0;
-		const int UP = 1;
-		const int RIGHT = 2;
-		const int DOWN = 3;
-		const int LEFT = 4;
-		//const int TryTime     6;
-		//const int SkipEdgePoint 2;
-		const int MIN_LINE_LENGTH = 6;
+        const int UP = 1;
+        const int RIGHT = 2;
+        const int DOWN = 3;
+        const int LEFT = 4;
+        //const int TryTime     6;
+        //const int SkipEdgePoint 2;
+        const int MIN_LINE_LENGTH = 6;
         public void PerformShapeDetection()
         {
-			Image<Bgr, Byte> img =
-				new Image<Bgr, byte>("pic3.png");
-			edLineDetector (img.Convert<Gray,byte>());
+            Image<Bgr, Byte> img =
+                new Image<Bgr, byte>("pic3.png");
+            edLineDetector(img.Convert<Gray, byte>());
         }
-  
-		class EdgeSegment {
-			
-			List<Point> pointList = new List<Point>();
 
-			public void addPoint(Point p){
-				pointList.Add (p);
-				
-			}
-			
-		}
-		class EdgeChain {
-			List<int> xCoordinates;//all the x coordinates of edge points
-			List<int> yCoordinates;//all the y coordinates of edge points
-			List<int> startID; //the start index of each edge in the coordinate arrays
-			int numberOfEdges;//the number of edges whose length are larger than minLineLen; numOfEdges < sId.size;
+        class EdgeSegment
+        {
 
-		}
+            List<Point> pointList = new List<Point>();
 
-		struct LineChains {
-			List<int> xCoordinates;//all the x coordinates of line points
-			List<int> yCoordinates;//all the y coordinates of line points
-			List<int> startID; //the start index of each line in the coordinate arrays
-			int numberOfLines;//the number of lines whose length are larger than minLineLen; numOfEdges < sId.size;
+            public void addPoint(Point p)
+            {
+                pointList.Add(p);
 
-		}
+            }
 
-		int imageWidth;
-		int imageHeight;
+        }
+        class EdgeChain
+        {
+            List<int> xCoordinates;//all the x coordinates of edge points
+            List<int> yCoordinates;//all the y coordinates of edge points
+            List<int> startID; //the start index of each edge in the coordinate arrays
+            int numberOfEdges;//the number of edges whose length are larger than minLineLen; numOfEdges < sId.size;
 
-		/*
+        }
+
+        struct LineChains
+        {
+            List<int> xCoordinates;//all the x coordinates of line points
+            List<int> yCoordinates;//all the y coordinates of line points
+            List<int> startID; //the start index of each line in the coordinate arrays
+            int numberOfLines;//the number of lines whose length are larger than minLineLen; numOfEdges < sId.size;
+
+        }
+
+        int imageWidth;
+        int imageHeight;
+
+        /*
 		public int EdLineDetection(Image<Gray, byte> img) {
 			EdgeChains edges;
 
@@ -202,15 +206,15 @@ namespace ShapeDetection
 		*/
 
 
-      private void textBox1_TextChanged(object sender, EventArgs e)
-      {
-         PerformShapeDetection();
-      }
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            PerformShapeDetection();
+        }
 
-      private void loadImageButton_Click(object sender, EventArgs e)
-      {
+        private void loadImageButton_Click(object sender, EventArgs e)
+        {
 
-      }
+        }
 
 
         bool isAnchorPoint(int x, int y, Image<Gray, float> gradientImage, Image<Gray, byte> directionImage, int anchorThreshold)
@@ -236,51 +240,57 @@ namespace ShapeDetection
             return false;
         }
 
-		bool goLeft(int x, int y, Image<Gray, float> gradientImage, Image<Gray, byte> directionImage, Image<Gray, float> edgeImage, List<Point> edgeSegment, Tuple<List<int>, List<int>> edgeSegmentTuple)
+        bool goLeft(int x, int y, Image<Gray, float> gradientImage, Image<Gray, byte> directionImage, Image<Gray, float> edgeImage, List<Point> edgeSegment, Tuple<List<double>, List<double>> edgeSegmentTuple)
         {
             if (x > gradientImage.Width || y > gradientImage.Height)
-                return;
+                return false;
             while (gradientImage.Data[y, x, 0] > 0 && edgeImage.Data[y, x, 0] == 0 && directionImage.Data[y, x, 0] == HORIZONTAL)
             {
                 edgeImage.Data[y, x, 0] = 255; //Save as edge
-				edgeSegment.Add(new Point(x,y));
+                edgeSegment.Add(new Point(x, y));
+                edgeSegmentTuple.Item1.Add(x);
+                edgeSegmentTuple.Item2.Add(y);
                 //look at three neightbors to left and pick the one with largest gradient
 
-            if (gradientImage.Data[y-1, x-1,0] >gradientImage.Data[y,x-1,0] &&
-                    gradientImage.Data[y-1, x-1,0] > gradientImage.Data[y+1, x-1,0] )
+                if (gradientImage.Data[y - 1, x - 1, 0] > gradientImage.Data[y, x - 1, 0] &&
+                    gradientImage.Data[y - 1, x - 1, 0] > gradientImage.Data[y + 1, x - 1, 0])
                 {
                     x = x - 1;
                     y = y - 1;
-                } else if (gradientImage.Data[y+1, x-1,0] >gradientImage.Data[y, x-1,0] &&
-                    gradientImage.Data[y+1, x-1,0] > gradientImage.Data[y-1, x-1, 0])
+                }
+                else if (gradientImage.Data[y + 1, x - 1, 0] > gradientImage.Data[y, x - 1, 0] &&
+                  gradientImage.Data[y + 1, x - 1, 0] > gradientImage.Data[y - 1, x - 1, 0])
                 {
                     x = x - 1;
                     y = y + 1;
-                } else
+                }
+                else
                 {
                     x = x - 1;
                 }
             }
-			if (directionImage.Data [y, x, 0] == VERTICAL)
-				return true;
-			else
-				return false;
-           /* if (directionImage.Data[y, x, 0] == VERTICAL)
-            {
-                int x_temp = x;
-                int y_temp = y;
-                goUp(x, y, gradientImage, directionImage, edgeImage);
-                goLeft(x_temp, y_temp, gradientImage, directionImage, edgeImage);
-            }*/
+            if (directionImage.Data[y, x, 0] == VERTICAL)
+                return true;
+            else
+                return false;
+            /* if (directionImage.Data[y, x, 0] == VERTICAL)
+             {
+                 int x_temp = x;
+                 int y_temp = y;
+                 goUp(x, y, gradientImage, directionImage, edgeImage);
+                 goLeft(x_temp, y_temp, gradientImage, directionImage, edgeImage);
+             }*/
         }
-		bool goRight(int x, int y, Image<Gray, float> gradientImage, Image<Gray, byte> directionImage, Image<Gray, float> edgeImage, List<Point> edgeSegment, Tuple<List<int>, List<int>> edgeSegmentTuple)
+        bool goRight(int x, int y, Image<Gray, float> gradientImage, Image<Gray, byte> directionImage, Image<Gray, float> edgeImage, List<Point> edgeSegment, Tuple<List<double>, List<double>> edgeSegmentTuple)
         {
             if (x > gradientImage.Width || y > gradientImage.Height)
-                return;
+                return false;
             while (gradientImage.Data[y, x, 0] > 0 && edgeImage.Data[y, x, 0] == 0 && directionImage.Data[y, x, 0] == HORIZONTAL)
             {
                 edgeImage.Data[y, x, 0] = 255; //Save as edge
-				edgeSegment.Add(new Point(x,y));
+                edgeSegment.Add(new Point(x, y));
+                edgeSegmentTuple.Item1.Add(x);
+                edgeSegmentTuple.Item2.Add(y);
                 //look at three neightbors to right and pick the one with largest gradient
 
                 if (gradientImage.Data[y - 1, x + 1, 0] > gradientImage.Data[y, x + 1, 0] &&
@@ -290,7 +300,7 @@ namespace ShapeDetection
                     y = y - 1;
                 }
                 else if (gradientImage.Data[y + 1, x + 1, 0] > gradientImage.Data[y, x + 1, 0] &&
-                  gradientImage.Data[y + 1, x + 1, 0] > gradientImage.Data[y -1, x + 1, 0])
+                  gradientImage.Data[y + 1, x + 1, 0] > gradientImage.Data[y - 1, x + 1, 0])
                 {
                     x = x + 1;
                     y = y + 1;
@@ -300,10 +310,10 @@ namespace ShapeDetection
                     x = x + 1;
                 }
             }
-			if (directionImage.Data [y, x, 0] == VERTICAL)
-				return true;
-			else
-				return false;
+            if (directionImage.Data[y, x, 0] == VERTICAL)
+                return true;
+            else
+                return false;
             /*if (directionImage.Data[y, x, 0] == VERTICAL)
             {
                 int x_temp = x;
@@ -312,17 +322,19 @@ namespace ShapeDetection
                 goLeft(x_temp, y_temp, gradientImage, directionImage, edgeImage);
             }*/
         }
-		bool goDown(int x, int y, Image<Gray, float> gradientImage, Image<Gray, byte> directionImage, Image<Gray, float> edgeImage, List<Point> edgeSegment, Tuple<List<int>, List<int>> edgeSegmentTuple)
+        bool goDown(int x, int y, Image<Gray, float> gradientImage, Image<Gray, byte> directionImage, Image<Gray, float> edgeImage, List<Point> edgeSegment, Tuple<List<double>, List<double>> edgeSegmentTuple)
         {
             if (x > gradientImage.Width || y > gradientImage.Height)
-                return;
+                return false;
             while (gradientImage.Data[y, x, 0] > 0 && edgeImage.Data[y, x, 0] == 0 && directionImage.Data[y, x, 0] == VERTICAL)
             {
                 edgeImage.Data[y, x, 0] = 255; //Save as edge
-				edgeSegment.Add(new Point(x,y));
+                edgeSegment.Add(new Point(x, y));
+                edgeSegmentTuple.Item1.Add(x);
+                edgeSegmentTuple.Item2.Add(y);
                 //look at three neightbors to up and pick the one with largest gradient
 
-                if (gradientImage.Data[y + 1, x - 1, 0] > gradientImage.Data[y +1, x, 0] &&
+                if (gradientImage.Data[y + 1, x - 1, 0] > gradientImage.Data[y + 1, x, 0] &&
                         gradientImage.Data[y + 1, x - 1, 0] > gradientImage.Data[y + 1, x + 1, 0])
                 {
                     x = x - 1;
@@ -339,10 +351,10 @@ namespace ShapeDetection
                     y = y + 1;
                 }
             }
-			if (directionImage.Data [y, x, 0] == HORIZONTAL)
-				return true;
-			else
-				return false;
+            if (directionImage.Data[y, x, 0] == HORIZONTAL)
+                return true;
+            else
+                return false;
             /*if (directionImage.Data[y, x, 0] == HORIZONTAL)
             {
                 int x_temp = x;
@@ -352,14 +364,16 @@ namespace ShapeDetection
             }*/
         }
 
-		bool goUp(int x, int y, Image<Gray, float> gradientImage, Image<Gray, byte> directionImage, Image<Gray, float> edgeImage, List<Point> edgeSegment, Tuple<List<int>, List<int>> edgeSegmentTuple)
+        bool goUp(int x, int y, Image<Gray, float> gradientImage, Image<Gray, byte> directionImage, Image<Gray, float> edgeImage, List<Point> edgeSegment, Tuple<List<double>, List<double>> edgeSegmentTuple)
         {
             if (x > gradientImage.Width || y > gradientImage.Height)
-                return;
+                return false;
             while (gradientImage.Data[y, x, 0] > 0 && edgeImage.Data[y, x, 0] == 0 && directionImage.Data[y, x, 0] == VERTICAL)
             {
                 edgeImage.Data[y, x, 0] = 255; //Save as edge
-				edgeSegment.Add(new Point(x,y));
+                edgeSegment.Add(new Point(x, y));
+                edgeSegmentTuple.Item1.Add(x);
+                edgeSegmentTuple.Item2.Add(y);
                 //look at three neightbors to down and pick the one with largest gradient
 
                 if (gradientImage.Data[y - 1, x - 1, 0] > gradientImage.Data[y - 1, x, 0] &&
@@ -380,27 +394,27 @@ namespace ShapeDetection
                 }
             }
 
-			if (directionImage.Data [y, x, 0] == HORIZONTAL)
-				return true;
-			else
-				return false;
-         /*   if (directionImage.Data[y,x,0] == HORIZONTAL)
-            {
-                int x_temp = x;
-                int y_temp = y;
-                goLeft(x, y, gradientImage, directionImage, edgeImage);
-                goRight(x_temp, y_temp, gradientImage, directionImage, edgeImage);
-            }*/
+            if (directionImage.Data[y, x, 0] == HORIZONTAL)
+                return true;
+            else
+                return false;
+            /*   if (directionImage.Data[y,x,0] == HORIZONTAL)
+               {
+                   int x_temp = x;
+                   int y_temp = y;
+                   goLeft(x, y, gradientImage, directionImage, edgeImage);
+                   goRight(x_temp, y_temp, gradientImage, directionImage, edgeImage);
+               }*/
         }
         public void edLineDetector(Image<Gray, Byte> img)
         {
-			//EdgeChains edgeChains;
+            //EdgeChains edgeChains;
 
             int pixelsToJump = 4;
             int anchorThreshold = 50;
             Image<Gray, float> dX = img.Sobel(1, 0, 3);
             Image<Gray, float> dY = img.Sobel(0, 1, 3);
-			Image<Gray, byte> directionImage = img.CopyBlank ();
+            Image<Gray, byte> directionImage = img.CopyBlank();
             Image<Gray, float> sumdXdY = img.CopyBlank().Convert<Gray, float>();
             Image<Gray, float> thresholdImage = img.CopyBlank().Convert<Gray, float>();
             Image<Gray, float> edgeImage = img.CopyBlank().Convert<Gray, float>();
@@ -408,29 +422,33 @@ namespace ShapeDetection
             Image<Gray, float> dYAbs = dY.AbsDiff(sumdXdY); // same same
             CvInvoke.Add(dXAbs, dYAbs, sumdXdY);
             Debug.Write("HJEJA2");
+            CvInvoke.Imshow("dxabs", dXAbs);
+            CvInvoke.Imshow("dyAbs", dYAbs);
+
+
             //calc direction 255=horizontal, 0=vertical
             //CvInvoke.Compare(dXAbs, dYAbs, directionImage, CmpType.LessThan);
-			directionImage = dXAbs.Cmp (dYAbs, CmpType.LessThan);
-			CvInvoke.Imshow ("dir", directionImage);
-			CvInvoke.WaitKey ();
-           /* for (int i = 0; i < img.Width; i++)
-            {
-                for (int j = 0; j < img.Height; j++)
-                {
-                    if (dYAbs.Data[j,i,0] > dXAbs.Data[j,i,0])
-                    {
-                        directionImage.Data[j, i, 0] = 255;
-                    }
-                }
-            }*/
+            directionImage = dXAbs.Cmp(dYAbs, CmpType.LessThan);
+            CvInvoke.Imshow("dir", directionImage);
+            CvInvoke.WaitKey();
+            /* for (int i = 0; i < img.Width; i++)
+             {
+                 for (int j = 0; j < img.Height; j++)
+                 {
+                     if (dYAbs.Data[j,i,0] > dXAbs.Data[j,i,0])
+                     {
+                         directionImage.Data[j, i, 0] = 255;
+                     }
+                 }
+             }*/
             //Threshold image and set weak pixels to zero
             CvInvoke.Threshold(sumdXdY, thresholdImage, 36, 255, ThresholdType.ToZero);
 
             //Extract the anchor points
             List<Point> anchorPoints = new List<Point>();
-            for (int x = 1; x < img.Width-1; x += pixelsToJump)
+            for (int x = 1; x < img.Width - 1; x += pixelsToJump)
             {
-                for (int y = 1; y < img.Height-1; y += pixelsToJump)
+                for (int y = 1; y < img.Height - 1; y += pixelsToJump)
                 {
 
                     bool isAnchor = isAnchorPoint(x, y, thresholdImage, directionImage, anchorThreshold);
@@ -442,85 +460,97 @@ namespace ShapeDetection
                 }
             }
 
-			List<List<Point>> edgeSegments = new List<List<Point>> ();
-			List<Tuple<List<int>, List<int>>> edgeSegments2 = new List<Tuple<List<int>, List<int>>>();
+            List<List<Point>> edgeSegments = new List<List<Point>>();
+            List<Tuple<List<Double>, List<Double>>> edgeSegments2 = new List<Tuple<List<Double>, List<Double>>>();
 
-			//Do the smart routing
+            //Do the smart routing
             foreach (Point anchorPoint in anchorPoints)
             {
-				List<Point> edgeSegment = new List<Point> ();
-				Tuple<List<int>, List<int>> edgeSegmentTuple = new Tuple<List<int>, List<int>> ();
-				List<int> xData = new List<int> ();
-				List<int> yData = new List<int> ();
-				edgeSegmentTuple.Item1 = xData;
-				edgeSegmentTuple.Item2 = yData;
-				int x = anchorPoint.X;
-				int y = anchorPoint.Y;
-				bool adjacentPoints = true;
-				while (adjacentPoints) {
-					x = anchorPoint.X;
-					y = anchorPoint.Y;
-                 
-					if (directionImage.Data [y, x, 0] == HORIZONTAL) {
-						adjacentPoints = goRight (x, y, thresholdImage, directionImage, edgeImage, edgeSegment, edgeSegmentTuple);
-						x = anchorPoint.X;
-						y = anchorPoint.Y;
-						adjacentPoints = goLeft (x, y, thresholdImage, directionImage, edgeImage, edgeSegment, edgeSegmentTuple);
+                List<Point> edgeSegment = new List<Point>();
+                List<Double> xData = new List<Double>();
+                List<Double> yData = new List<Double>();
+                Tuple<List<Double>, List<Double>> edgeSegmentTuple = new Tuple<List<Double>, List<Double>>(xData, yData);
 
 
 
 
-					} else {
-						adjacentPoints = goDown (x, y, thresholdImage, directionImage, edgeImage, edgeSegment, edgeSegmentTuple);
-						x = anchorPoint.X;
-						y = anchorPoint.Y;
-						adjacentPoints = goUp (x, y, thresholdImage, directionImage, edgeImage, edgeSegment, edgeSegmentTuple);
-					}
-				}
-				edgeSegments.Add (edgeSegment);
-				edgeSegments2.Add (edgeSegmentTuple);
+                int x = anchorPoint.X;
+                int y = anchorPoint.Y;
+                bool adjacentPoints = true;
+                while (adjacentPoints)
+                {
+                    x = anchorPoint.X;
+                    y = anchorPoint.Y;
+
+                    if (directionImage.Data[y, x, 0] == HORIZONTAL)
+                    {
+                        adjacentPoints = goRight(x, y, thresholdImage, directionImage, edgeImage, edgeSegment, edgeSegmentTuple);
+                        x = anchorPoint.X;
+                        y = anchorPoint.Y;
+                        adjacentPoints = goLeft(x, y, thresholdImage, directionImage, edgeImage, edgeSegment, edgeSegmentTuple);
+
+
+
+
+                    }
+                    else
+                    {
+                        adjacentPoints = goDown(x, y, thresholdImage, directionImage, edgeImage, edgeSegment, edgeSegmentTuple);
+                        x = anchorPoint.X;
+                        y = anchorPoint.Y;
+                        adjacentPoints = goUp(x, y, thresholdImage, directionImage, edgeImage, edgeSegment, edgeSegmentTuple);
+                    }
+                }
+                edgeSegments.Add(edgeSegment);
+                edgeSegments2.Add(edgeSegmentTuple);
+            }
+            CvInvoke.Imshow("edge", edgeImage);
+            CvInvoke.WaitKey();
+            List<List<Point>> candidates = new List<List<Point>>();
+
+            //Extract found circles
+            foreach (List<Point> edgeSegment in edgeSegments)
+            {
+                if (edgeSegment.Count == 0)
+                    continue;
+                Point startPoint = edgeSegment[0];
+                Point endPoint = edgeSegment[edgeSegment.Count - 1];
+                int startX = startPoint.X;
+                int startY = startPoint.Y;
+                int endX = endPoint.X;
+                int endY = endPoint.Y;
+
+                if ((startX - 1 == endX && startY + 1 == endY) || (startX - 1 == endX && startY == endY) ||
+                    (startX - 1 == endX && startY - 1 == endY) || (startX == endX && startY + 1 == endY) ||
+                    (startX == endX && startY == endY) || (startX == endX && startY - 1 == endY) ||
+                        (startX + 1 == endX && startY + 1 == endY) || (startX + 1 == endX && startY == endY) ||
+                        (startX + 1 == endX && startY - 1 == endY))
+                {
+                    candidates.Add(edgeSegment);
+                }
+                Ellipse ellipse = new Ellipse();
+                //ellipse = PointCollection.EllipseLeastSquareFitting(edgeSegment.ToArray());
+
+                //calc for each point x^2/a^2+y^2/b^2 -1 = err. Sum and take mean 
+
+
+
             }
 
-			List<List<Point>> candidates = new List<List<Point>> ();
+            //Create edges
+            int MIN_LINE_LENGTH = 6;
+            foreach (Tuple<List<double>, List<double>> edgeSegment in edgeSegments2)
+            {
 
-			//Extract found circles
-			foreach (List<Point> edgeSegment in edgeSegments) {
-				Point startPoint = edgeSegment [0];
-				Point endPoint = edgeSegment [edgeSegment.Count];
-				int startX = startPoint.X;
-				int startY = startPoint.Y;
-				int endX = endPoint.X;
-				int endY = endPoint.Y;
+                List<double> xData = new List<double>();
+                xData = edgeSegment.Item1;
+                List<double> yData = new List<double>();
+                yData = edgeSegment.Item2;
 
-				if ((startX-1 == endX && startY+1 == endY) || (startX-1 == endX && startY == endY) ||
-					(startX-1==endX && startY-1==endY) || (startX==endX && startY+1==endY) ||
-					(startX==endX && startY==endY) || (startX==endX && startY-1 == endY) ||
-						(startX+1 == endX && startY+1==endY) || (startX+1==endX && startY ==endY) ||
-						(startX+1 == endX && startY-1==endY)) {
-					candidates.Add (edgeSegment);
-					}
-				Ellipse ellipse = new Ellipse();
-				ellipse = PointCollection.EllipseLeastSquareFitting(pointList.ToArray());
+                LineFit(edgeSegment);
 
-				//calc for each point x^2/a^2+y^2/b^2 -1 = err. Sum and take mean 
-
-
-
-			}
-
-			//Create edges
-			int MIN_LINE_LENGTH = 6;
-			foreach (Tuple<List<int>,List<int>> edgeSegment in edgeSegments2) {
-				
-			List<int> xData = new List<int> ();
-				xData = edgeSegment.Item1;
-			List<int> yData = new List<int> ();
-				yData = edgeSegment.Item2;
-			
-				LineFit (edgeSegment);
-			
-			}
-			/*
+            }
+            /*
             foreach(Point anchorPoint in anchorPoints)
             {
                 int x = anchorPoint.X;
@@ -582,115 +612,124 @@ namespace ShapeDetection
 
         }
 
-						public double ComputePointDistance2Line(double a, double b, double c, int x, int y){
-			Math.Abs (a * x + b * y + c) / Math.Sqrt (Math.Pow (a, 2) + Math.Pow (b, 2));
-		}
-
-
-		public void LineFit(Tuple<List<int>,List<int>> edgeSegment ) {
-			List<int> xData = new List<int> ();
-			xData = edgeSegment.Item1;
-			List<int> yData = new List<int> ();
-			yData = edgeSegment.Item2;
-
-			double lineFitError = Double.MaxValue;
-			int numberOfPixels = xData.Count;
-
-			lineFitError = Double.MaxValue; // current line fit error
-
-			Tuple<double, double> line; // y = ax+b OR x = ay+b
-			double a = 0;
-			double b = 0;
-
-			while (numberOfPixels > MIN_LINE_LENGTH) {
-
-				Tuple<double, double> line2 = Fit.Line (xData.ToArray (), yData.ToArray ());
-
-				a = line2.Item1;
-				b = line2.Item2;
-				GoodnessOfFit.RSquared (xData.Select (x => a + b * x), yData.ToArray ());
-				if (lineFitError <= 1.0)
-					break; // OK. An initial line segment detected
-
-				// Skip the first pixel & try with the remaining pixels
-				xData.RemoveAt (xData.Count);
-				yData.RemoveAt (yData.Count);
-
-				numberOfPixels--; // One less pixel
-
-			} // end-while
-
-
-
-			if (lineFitError > 1.0)
-				return; // no initial line segment. Done.
-
-
-
-			// An initial line segment detected. Try to extend this line segment
-
-			int lineLen = MIN_LINE_LENGTH;
-			List<int> xDataExtended = new List<int> ();
-			List<int> yDataExtended = new List<int> ();
-			for (int i = 0; i < MIN_LINE_LENGTH; i++) {
-				xDataExtended [i] = xData [i];
-				yDataExtended [i] = yData [i];
-			}
-
-			while (lineLen < numberOfPixels) {
-				int x = edgeSegment.Item1 [lineLen];
-				int y = edgeSegment.Item2 [lineLen];
-
-
-				double d = ComputePointDistance2Line (a, -1, b, x, y);
-
-				if (d > 1.0)
-					break;
-
-				lineLen++;
-
-			} //end-while
-
-
-
-			// End of the current line segment. Compute the final line equation & output it.
-
-			Tuple<double,double> line3 = Fit.Line (xDataExtended.ToArray (), yDataExtended.ToArray ());
-
-
-
-
-
-			// Extract line segments from the remaining pixels
-			for (int i = lineLen; i < edgeSegment.Item1.Count; i++) {
-				xData [i - lineLen] = edgeSegment.Item1 [i];
-				yData [i - lineLen] = edgeSegment.Item2 [i];
-					
-			
-			}
-			for (int i = 0; i < lineLen; i++) {
-				edgeSegment.Item1.RemoveAt (i);
-				edgeSegment.Item2.RemoveAt (i);
-			}
-			LineFit (xData, yData, edgeSegment);
-		}
-
-
-
-    public class NoEllipsesFoundException : Exception
-    {
-        public NoEllipsesFoundException(string message) : base(message)
+        public double ComputePointDistance2Line(double a, double b, double c, int x, int y)
         {
+            return Math.Abs(a * x + b * y + c) / Math.Sqrt(Math.Pow(a, 2) + Math.Pow(b, 2));
+        }
+
+
+        public void LineFit(Tuple<List<double>, List<double>> edgeSegment)
+        {
+            List<double> xData = new List<double>();
+            xData = edgeSegment.Item1;
+            List<double> yData = new List<double>();
+            yData = edgeSegment.Item2;
+
+
+
+            double lineFitError = Double.MaxValue;
+            int numberOfPixels = xData.Count;
+
+            lineFitError = Double.MaxValue; // current line fit error
+
+            Tuple<double, double> line; // y = ax+b OR x = ay+b
+            double a = 0;
+            double b = 0;
+
+            while (numberOfPixels > MIN_LINE_LENGTH)
+            {
+
+                Tuple<double, double> line2 = Fit.Line(xData.ToArray(), yData.ToArray());
+
+                a = line2.Item1;
+                b = line2.Item2;
+                GoodnessOfFit.RSquared(xData.Select(x => a + b * x), yData.ToArray());
+                if (lineFitError <= 1.0)
+                    break; // OK. An initial line segment detected
+
+                // Skip the first pixel & try with the remaining pixels
+                xData.RemoveAt(xData.Count - 1);
+                yData.RemoveAt(yData.Count - 1);
+
+                numberOfPixels--; // One less pixel
+
+            } // end-while
+
+
+
+            if (lineFitError > 1.0)
+                return; // no initial line segment. Done.
+
+
+
+            // An initial line segment detected. Try to extend this line segment
+
+            int lineLen = MIN_LINE_LENGTH;
+            List<double> xDataExtended = new List<double>();
+            List<double> yDataExtended = new List<double>();
+            for (int i = 0; i < MIN_LINE_LENGTH; i++)
+            {
+                xDataExtended[i] = xData[i];
+                yDataExtended[i] = yData[i];
+            }
+
+            while (lineLen < numberOfPixels)
+            {
+                double x = edgeSegment.Item1[lineLen];
+                double y = edgeSegment.Item2[lineLen];
+
+
+                double d = ComputePointDistance2Line(a, -1, b, (int)x, (int)y);
+
+                if (d > 1.0)
+                    break;
+
+                lineLen++;
+
+            } //end-while
+
+
+
+            // End of the current line segment. Compute the final line equation & output it.
+
+            Tuple<double, double> line3 = Fit.Line(xDataExtended.ToArray(), yDataExtended.ToArray());
+
+
+
+
+
+            // Extract line segments from the remaining pixels
+            for (int i = lineLen; i < edgeSegment.Item1.Count; i++)
+            {
+                xData[i - lineLen] = edgeSegment.Item1[i];
+                yData[i - lineLen] = edgeSegment.Item2[i];
+
+
+            }
+            for (int i = 0; i < lineLen; i++)
+            {
+                edgeSegment.Item1.RemoveAt(i);
+                edgeSegment.Item2.RemoveAt(i);
+            }
+            LineFit(edgeSegment);
+        }
+
+
+
+        public class NoEllipsesFoundException : Exception
+        {
+            public NoEllipsesFoundException(string message) : base(message)
+            {
+
+            }
+        }
+        public class ToManyEllipsesFound : Exception
+        {
+            public ToManyEllipsesFound(string message) : base(message)
+            {
+
+            }
 
         }
-    }
-    public class ToManyEllipsesFound : Exception
-    {
-        public ToManyEllipsesFound(string message) : base(message)
-        {
-
-        }
-	
-		}  
     }
 }
